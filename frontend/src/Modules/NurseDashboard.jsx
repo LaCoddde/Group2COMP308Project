@@ -64,7 +64,7 @@ const PatientRow = ({ vitalSign }) => {
       <td className="border px-4 py-2">{vitalSign.bloodPressure}</td>
       <td className="border px-4 py-2">{vitalSign.respiratoryRate}</td>
       <td className="border px-4 py-2">
-      <button className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-1 px-3 rounded-md text-sm" onClick={() => { previousVisit(vitalSign.patientId) }}>Previous Visit</button>
+      <button className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-1 px-3 rounded-md text-sm" onClick={() => { previousVisit(vitalSign.patientId) }}>View Patient Data</button>
 
          </td>
     </tr>
