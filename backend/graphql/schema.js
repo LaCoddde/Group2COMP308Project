@@ -4,7 +4,7 @@ const VitalSigns = require("../models/VitalSign");
 const DailyInfo = require("../models/DailyInfo");
 const Symptoms = require("../models/Symptoms");
 const MotivationalTips = require("../models/MotivationalTips");
-
+const Report = require("../models/Report");
 
 const schema = buildSchema(`
     type User {
@@ -53,7 +53,15 @@ const schema = buildSchema(`
       patientId: ID!
       motivationalTips: String
       createdAt: String
-  }
+    }
+
+    type Report {
+      id: ID!
+      nurseId: ID!
+      patientId: ID!
+      report: String
+      createdAt: String
+    }
 
     type Query {
         users: [User]
@@ -62,8 +70,9 @@ const schema = buildSchema(`
         getVitalSignsByNurseId(nurseId: String!): [VitalSigns]
         getDailyInfoByPatientId(patientId: String!): [DailyInfo]
         getSymptomsByPatientId(patientId: String!): [Symptoms]
-        getPatientInfoById(patientId: String!): User
         getMotivationalTips(patientId: String!): [MotivationalTips]
+        getReportsByPatientId(patientId: String!): [Report]
+        getPatientInfoById(patientId: String!): User
         currentUser: User
     }
 
@@ -72,6 +81,7 @@ const schema = buildSchema(`
         recordDailyInfo(patientId: String!, pulseRate: Float, bloodPressure: String, weight: Float, temperature: Float, respiratoryRate: Float): DailyInfo
         recordSymptoms(patientId: String!, symptomsList: [String]!): Symptoms
         createMotivationalTips(nurseId: String!, patientId: ID!, motivationalTips: String): MotivationalTips
+        sendReport(nurseId: String!, patientId: ID!, report: String!): Report
     }
 `);
 
@@ -79,12 +89,12 @@ const root = {
   users: () => User.find(),
   nurses: () => User.find({ roleId: "nurse" }),
   patients: () => User.find({ roleId: "patient" }),
-  getVitalSignsByNurseId: async ({nurseId}) => {
+  getVitalSignsByNurseId: async ({ nurseId }) => {
     const nurse = await User.findById(nurseId);
-    if(!nurse) {
+    if (!nurse) {
       throw new Error("Nurse not found");
     }
-    const vitalSigns = await VitalSigns.find({ nurseId: nurse._id}).sort('createdAt');
+    const vitalSigns = await VitalSigns.find({ nurseId: nurse._id }).sort('createdAt');
     return vitalSigns;
   },
   getDailyInfoByPatientId: async ({ patientId }) => {
@@ -103,7 +113,6 @@ const root = {
     }
     return await Symptoms.find({ patientId: patient._id });
   },
-
   getMotivationalTips: async ({ patientId }) => {
     const patient = await User.findById(patientId);
     if (!patient) {
@@ -113,8 +122,7 @@ const root = {
       createdAt: -1,
     });
   },
-
-  getPatientInfoById: async ({patientId}) => {
+  getPatientInfoById: async ({ patientId }) => {
     return await User.findById(patientId);
   },
   recordVitalSigns: async ({
@@ -129,12 +137,10 @@ const root = {
     if (!nurse) {
       throw new Error("Nurse not found");
     }
-
     const patient = await User.findById(patientId);
     if (!patient) {
       throw new Error("Patient not found");
     }
-
     try {
       const newVitalSigns = new VitalSigns({
         nurseId: nurse._id,
@@ -150,7 +156,6 @@ const root = {
       throw new Error("Error saving vital signs");
     }
   },
-
   recordDailyInfo: async ({
     patientId,
     pulseRate,
@@ -163,8 +168,8 @@ const root = {
     if (!patient) {
       throw new Error("Patient not found");
     }
-    //overwrite other data of same patient
-    await DailyInfo.deleteMany({patientId: patient._id});
+    // overwrite other data of same patient
+    await DailyInfo.deleteMany({ patientId: patient._id });
     try {
       const newDailyInfo = new DailyInfo({
         patientId: patient._id,
@@ -180,42 +185,31 @@ const root = {
       throw new Error("Error saving daily info");
     }
   },
-
   recordSymptoms: async ({ patientId, symptomsList }) => {
-    // Find the patient by username
     const patient = await User.findById(patientId);
     if (!patient) {
       throw new Error("Patient not found");
     }
-
-    // Create a new Symptoms document using the patient's ID
     const newSymptoms = new Symptoms({
       patientId: patient._id,
       symptomsList,
       recordedAt: new Date(),
     });
-
-    // Save and return the new Symptoms document
     return newSymptoms.save();
   },
-
-
   createMotivationalTips: async ({
     nurseId,
     patientId,
     motivationalTips,
-
   }) => {
     const nurse = await User.findById(nurseId);
     if (!nurse) {
       throw new Error("Nurse not found");
     }
-
     const patient = await User.findById(patientId);
     if (!patient) {
       throw new Error("Patient not found");
     }
-
     try {
       const newMotivationalTips = new MotivationalTips({
         nurseId: nurse._id,
@@ -228,9 +222,36 @@ const root = {
       throw new Error("Error saving Motivational Tips");
     }
   },
-
   currentUser: (args, context) => {
     return context.req.session.user;
+  },
+  sendReport: async ({ nurseId, patientId, report }) => {
+    const nurse = await User.findById(nurseId);
+    if (!nurse) {
+      throw new Error("Nurse not found");
+    }
+    const patient = await User.findById(patientId);
+    if (!patient) {
+      throw new Error("Patient not found");
+    }
+    try {
+      const newReport = new Report({
+        nurseId: nurse._id,
+        patientId: patient._id,
+        report,
+        createdAt: new Date(),
+      });
+      return await newReport.save();
+    } catch (error) {
+      throw new Error("Error saving report");
+    }
+  },
+  getReportsByPatientId: async ({ patientId }) => {
+    const patient = await User.findById(patientId);
+    if (!patient) {
+      throw new Error("Patient not found");
+    }
+    return await Report.find({ patientId: patient._id }).sort({ createdAt: -1 });
   },
 };
 

@@ -1,9 +1,8 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { gql, useQuery } from "@apollo/client";
 import Header from "./Header";
 import { AuthContext } from "../Context/AuthContext";
-import { useNavigate, useParams } from "react-router-dom";
 
 const GET_VITAL_SIGNS_BY_NURSE_ID = gql`
   query GetVitalSignsByNurseId($nurseId: String!) {
@@ -33,7 +32,6 @@ const GET_PATIENT_INFO_BY_ID = gql`
 `;
 
 const PatientRow = ({ vitalSign }) => {
-
   const navigate = useNavigate();
 
   const {
@@ -44,16 +42,14 @@ const PatientRow = ({ vitalSign }) => {
     variables: { patientId: vitalSign.patientId },
   });
 
- 
   const previousVisit = (id) => {
-    navigate('/previous-visit/' + id);
+    navigate("/previous-visit/" + id);
   };
 
   if (patientLoading) return <p>Loading patient data...</p>;
   if (patientError)
     return <p>Error loading patient data: {patientError.message}</p>;
 
-  console.log(vitalSign, patientData.getPatientInfoById.name)
   return (
     <tr key={vitalSign.id}>
       <td className="border px-4 py-2">
@@ -64,18 +60,21 @@ const PatientRow = ({ vitalSign }) => {
       <td className="border px-4 py-2">{vitalSign.bloodPressure}</td>
       <td className="border px-4 py-2">{vitalSign.respiratoryRate}</td>
       <td className="border px-4 py-2">
-      <button className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-1 px-3 rounded-md text-sm" onClick={() => { previousVisit(vitalSign.patientId) }}>View Patient Data</button>
-
-         </td>
+        <button
+          className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-1 px-3 rounded-md text-sm"
+          onClick={() => {
+            previousVisit(vitalSign.patientId);
+          }}
+        >
+          View Patient Data
+        </button>
+      </td>
     </tr>
   );
 };
 
 export default function NurseDashboard() {
   const { loginData } = useContext(AuthContext);
-  
-  const [vitalSign, setVitalSign] = useState(null);
-
   const { loading, error, data, refetch } = useQuery(
     GET_VITAL_SIGNS_BY_NURSE_ID,
     {
@@ -132,7 +131,7 @@ export default function NurseDashboard() {
                 </thead>
                 <tbody>
                   {data.getVitalSignsByNurseId.map((vitalSign) => (
-                    <PatientRow vitalSign={vitalSign} />
+                    <PatientRow key={vitalSign.id} vitalSign={vitalSign} />
                   ))}
                 </tbody>
               </table>
@@ -140,6 +139,14 @@ export default function NurseDashboard() {
           ) : (
             <p>No vital signs found.</p>
           )}
+          <div className="fixed bottom-24 left-4">
+            {/* <Link
+              to="/condition-prediction"
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full"
+            >
+              Predict Conditions
+            </Link> */}
+          </div>
           <div className="fixed bottom-12 right-4">
             <Link
               to="/record-visit"

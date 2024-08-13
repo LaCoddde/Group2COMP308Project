@@ -1,16 +1,13 @@
 import React, { useContext } from "react";
 import { useEffect } from "react";
 import { gql, useQuery } from "@apollo/client";
-import { toast } from "react-toastify";
 import Header from "./Header";
 import { AuthContext } from "../Context/AuthContext";
-import { useLocation, useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 
-export default function PreviousVisitsPage(props) {
+export default function PreviousVisitsPage() {
   const { loginData } = useContext(AuthContext);
   let { id } = useParams();
-  console.log("Testing Id " + id);
-
   const navigate = useNavigate();
 
   const GET_PATIENT_INFO = gql`
@@ -61,8 +58,13 @@ export default function PreviousVisitsPage(props) {
   if (error) return `Error! ${error.message}`;
 
   const patientInfo = data.getPatientInfoById;
-
   const vitalSigns = dataData.getVitalSignsByNurseId;
+
+  const handlePredictConditions = () => {
+    navigate("/condition-prediction", {
+      state: { patientName: patientInfo.name, patientId: id },
+    });
+  };
 
   return (
     <div className="container mx-auto px-4 py-3">
@@ -142,11 +144,16 @@ export default function PreviousVisitsPage(props) {
           </tbody>
         </table>
       </div>
-      <div>
+      <div className="mt-6 flex space-x-4">
         <button
-          type="reset"
+          onClick={handlePredictConditions}
+          className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-500 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+        >
+          Predict Conditions
+        </button>
+        <button
           onClick={() => navigate("/nurse-dashboard")}
-          className="w-50 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
         >
           Return to Dashboard
         </button>

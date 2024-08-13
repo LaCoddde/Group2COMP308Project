@@ -12,6 +12,8 @@ import SymptomChecklistForm from './Modules/SymptomsChecklistForm';
 import PreviousVisitsPage from './Modules/PreviousVisitData';
 import MotivationalTipsForm from './Modules/MotivationalTipsForm';
 import DisplayMotivationalTips from './Modules/DisplayMotivationalTips';
+import ConditionPrediction from "./Modules/ConditionPrediction";
+import DocReport from './Modules/DocReport';
 import { ToastContainer } from 'react-toastify';
 
 import 'react-toastify/dist/ReactToastify.css';
@@ -40,7 +42,8 @@ function App() {
           <Route path="/previous-visit/:id" element={<PreviousVisitsPage/>} />
           <Route path="/motivational-form" element={< MotivationalTipsForm/>} />
           <Route path="/display-motivational-tips" element={< DisplayMotivationalTips/>} />
-          
+          <Route path="/condition-prediction" element={<ConditionPrediction />} />
+          <Route path="/doc-reports" component={DocReport} />
         </Route>
     </Routes>
     </>
