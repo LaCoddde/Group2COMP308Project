@@ -1,7 +1,7 @@
 import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import {toast} from 'react-toastify';
+import { toast } from 'react-toastify';
 import { AuthContext } from "../Context/AuthContext";
 import logo from '../images/logo.jpg';
 
@@ -21,12 +21,12 @@ export default function SignUp() {
     try {
       const roleId = role === "nurse" ? "nurse" : "patient";
       const response = await axios.post(
-        "http://localhost:4000/api/auth/register",
+        `${process.env.REACT_APP_API_URL || 'http://localhost:4000'}/api/auth/register`,
         {
           email,
           password,
           roleId,
-          name, 
+          name,
           gender,
           age
         }
