@@ -6,7 +6,7 @@ export default function Home() {
   return (
     <div className="bg-white min-h-screen flex flex-col">
      <Header/>
-      <div className="relative isolate flex-1 overflow-hidden px-6 pt-12 pb-14 lg:px-8">
+      <div className="relative isolate flex-1 overflow-hidden px-6 pt-24 pb-12 lg:px-8">
         <div
           className="absolute inset-x-0 -top-28 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-56"
           aria-hidden="true"
