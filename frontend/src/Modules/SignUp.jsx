@@ -1,5 +1,5 @@
 import React, { useState, useContext } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from 'react-toastify';
 import { AuthContext } from "../Context/AuthContext";
@@ -12,7 +12,7 @@ export default function SignUp() {
   const [age, setAge] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("nurse");
-  const { setLogin } = useContext(AuthContext);
+  const { setLogin, loginData } = useContext(AuthContext);
 
   const navigate = useNavigate();
 
@@ -60,15 +60,37 @@ export default function SignUp() {
     }
   };
 
+  const isAuthed = Boolean(localStorage.getItem("token"));
+  const roleFromContext = loginData?.roleId;
+  const logoTarget = isAuthed ? (roleFromContext === "patient" ? "/patient-dashboard" : "/nurse-dashboard") : "/";
+
   return (
     <>
-      <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
-        <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-          <img
-            className="mx-auto h-20 w-auto"
-            src={logo}
-            alt="Med Path"
+      <div className="relative isolate flex min-h-screen flex-1 flex-col justify-center overflow-hidden px-6 py-12 lg:px-8">
+        <div
+          className="absolute inset-x-0 -top-24 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-40"
+          aria-hidden="true"
+        >
+          <div
+            className="relative left-[calc(50%-10rem)] aspect-[1155/678] w-[30rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-[#ff80b5] to-[#9089fc] opacity-30 sm:left-[calc(50%-26rem)] sm:w-[56rem]"
           />
+        </div>
+        <div
+          className="absolute inset-x-0 top-[calc(100%-18rem)] -z-10 transform-gpu overflow-hidden blur-3xl sm:top-[calc(100%-24rem)]"
+          aria-hidden="true"
+        >
+          <div
+            className="relative left-[calc(50%+4rem)] aspect-[1155/678] w-[30rem] -translate-x-1/2 bg-gradient-to-tr from-[#ff80b5] to-[#9089fc] opacity-30 sm:left-[calc(50%+24rem)] sm:w-[56rem]"
+          />
+        </div>
+        <div className="sm:mx-auto sm:w-full sm:max-w-sm">
+          <Link to={logoTarget}>
+            <img
+              className="mx-auto h-20 w-auto"
+              src={logo}
+              alt="Med Path"
+            />
+          </Link>
           <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
             Sign up for an account
           </h2>
@@ -208,9 +230,9 @@ export default function SignUp() {
             <div>
               <button
                 type="submit"
-                className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                className="flex w-full justify-center rounded-md bg-gradient-to-r from-[#ff80b5] to-[#9089fc] px-3 py-2 text-sm font-semibold leading-6 text-white shadow-md transition hover:opacity-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
               >
-                Sign up
+                Sign Up
               </button>
             </div>
           </form>
